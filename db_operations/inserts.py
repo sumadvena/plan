@@ -50,3 +50,33 @@ def create_group(name, level, id_school):
     cnx.commit()
     cursor.close()
     cnx.close()
+
+
+def grant_privilege_to_course(
+    privilege_table, who_gets_privilege, privileged_id, course_id
+):
+    if not check_existance(who_gets_privilege, privileged_id):
+        print(
+            f"There is no such entry: {who_gets_privilege} - {privileged_id}. Could not grant privilege"
+        )
+        return
+    if not check_existance("courses", course_id):
+        print(f"There is no such course: {course_id}. Could not grant privilege")
+        return
+
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+    columns_query = f"SHOW COLUMNS FROM {privilege_table}"
+    cursor.execute(columns_query)
+    get_columns = cursor.fetchall()
+    columns = []
+    for Field, Type, Null, Key, Default, Extra in get_columns:
+        columns.append(Field)
+
+    query = f"INSERT INTO {privilege_table} ({columns[0]},{columns[1]}) VALUES (%s, %s)"
+
+    cursor.execute(query, (privileged_id, course_id))
+
+    cnx.commit()
+    cursor.close()
+    cnx.close()
