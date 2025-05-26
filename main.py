@@ -10,10 +10,12 @@ from db_operations import inserts
 def main():
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
-    query = "select id from schools"
+    query = "show columns from privileges_classrooms"
     cursor.execute(query)
     rows = cursor.fetchall()
-    inserts.create_teacher("a", "b", 123)
+    print(rows)
+    inserts.grant_privilege_to_course("privileges_teachers", "teachers", 1, 1)
+
     cursor.close()
     cnx.close()
 

@@ -24,29 +24,43 @@ def create_course(name, hours_weekly, level):
     cnx.close()
 
 
-def create_teacher(name, surname, id_school):
-    if not check_existance("schools", id_school):
-        print(f"There is no such school: {id_school}. Could not create teacher")
+def create_teacher(name, surname, school_id):
+    if not check_existance("schools", school_id):
+        print(f"There is no such school: {school_id}. Could not create teacher")
         return
 
     query = "INSERT INTO teachers (name, surname, id_school) VALUES (%s, %s, %s)"
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
-    cursor.execute(query, (name, surname, id_school))
+    cursor.execute(query, (name, surname, school_id))
     cnx.commit()
     cursor.close()
     cnx.close()
 
 
-def create_group(name, level, id_school):
-    if not check_existance("schools", id_school):
-        print(f"There is no such school: {id_school}. Could not create group")
+def create_group(name, level, school_id):
+    if not check_existance("schools", school_id):
+        print(f"There is no such school: {school_id}. Could not create group")
         return
 
     query = "INSERT INTO groups (name, level, id_school) VALUES (%s, %s, %s)"
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
-    cursor.execute(query, (name, level, id_school))
+    cursor.execute(query, (name, level, school_id))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+
+def create_classrom(location, school_id):
+    if not check_existance("schools", school_id):
+        print(f"There is no such school: {school_id}. Could not create group")
+        return
+
+    query = "INSERT INTO groups (location, id_school) VALUES (%s, %s)"
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+    cursor.execute(query, (location, school_id))
     cnx.commit()
     cursor.close()
     cnx.close()
@@ -80,3 +94,30 @@ def grant_privilege_to_course(
     cnx.commit()
     cursor.close()
     cnx.close()
+
+
+def create_assigned_set(teacher_id, course_id, group_id):
+    if not check_existance("teachers", teacher_id):
+        print(f"There is no such teacher: {teacher_id}. Could not create a set")
+        return
+
+    if not check_existance("courses", course_id):
+        print(f"There is no such course: {course_id}. Could not create a set")
+        return
+
+    if not check_existance("group", group_id):
+        print(f"There is no such group: {group_id}. Could not create a set")
+        return
+
+    query = "INSERT INTO assigned_sets (id_teacher, id_course, id_group) VALUES (%s, %s, %s)"
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+    cursor.execute(query, (teacher_id, course_id, group_id))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+
+# TODO:this below
+def create_schedule():
+    pass
