@@ -42,7 +42,7 @@ def find_id(table: str, fields: tuple):
         case "courses":
             query += "courses WHERE name = %s AND hours_weekly = %s AND level = %s"
         case "schedule":
-            query += "schedule WHERE year = %s AND id_school = %s AND version = %s AND timeframe = %s AND id_assigned_set = %s AND id_classroom = %s"
+            query += "schedule WHERE year = %s AND id_school = %s AND schedule_version = %s AND timeframe = %s AND id_assigned_set = %s AND id_classroom = %s"
 
     query += " LIMIT 1"
     cnx = mysql.connector.connect(**config)
@@ -80,10 +80,32 @@ def check_privilege(who_check: str, id_check: int, course_id: int):
 
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
-    query = f"SELECT * FROM {who_check}s WHERE id_{who_check} = %s AND id_course = %s"
+    query = f"SELECT * FROM privileges_{who_check}s WHERE id_{who_check} = %s AND id_course = %s"
     cursor.execute(query, (id_check, course_id))
     privilege = cursor.fetchone()
 
     cursor.close()
     cnx.close()
     return True if privilege else False
+
+
+def check_booked_classroom(fields: tuple):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+    query = "SELECT id FROM schedule WHERE year = %s AND id_school = %s AND schedule_version = %s AND timeframe = %s AND id_classroom = %s LIMIT 1"
+    cursor.execute(query, fields)
+    booked = cursor.fetchone()
+    cursor.close()
+    cnx.close()
+    return True if booked else False
+
+
+def check_booked_set(fields: tuple):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+    query = "SELECT id FROM schedule WHERE year = %s AND id_school = %s AND schedule_version = %s AND timeframe = %s AND id_assigned_set = %s LIMIT 1"
+    cursor.execute(query, fields)
+    booked = cursor.fetchone()
+    cursor.close()
+    cnx.close()
+    return True if booked else False

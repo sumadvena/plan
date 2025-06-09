@@ -133,7 +133,7 @@ def create_assigned_set(teacher_id, course_id, group_id):
         print(f"There is no such course: {course_id}. Could not create a set")
         return False
 
-    if not utils.check_existance("group", group_id):
+    if not utils.check_existance("groups", group_id):
         print(f"There is no such group: {group_id}. Could not create a set")
         return False
 
@@ -184,7 +184,7 @@ def create_timeframe(
         )
         return False
 
-    query = "INSERT INTO schedule (year, school_id, version, timeframe, assigned_set_id, classroom_id) VALUES (%s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO schedule (year, id_school, schedule_version, timeframe, id_assigned_set, id_classroom) VALUES (%s, %s, %s, %s, %s, %s)"
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
     cursor.execute(

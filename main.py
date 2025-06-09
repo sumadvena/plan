@@ -10,17 +10,10 @@ from schedule import populate, schedule
 
 
 def main():
-    cnx = mysql.connector.connect(**config)
-    cursor = cnx.cursor()
-    query = "show columns from privileges_classrooms"
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    print(rows)
-    schedule.simple_reasoning(2002, 1, 1)
+    schedule.simple_reasoning(year=2002, school_id=1)
+    schedule.simple_reasoning(year=2002, school_id=2)
 
-    cursor.close()
-    cnx.close()
-    populate.populate()
+    # populate.populate()
 
 
 if __name__ == "__main__":
