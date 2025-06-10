@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Planów Lekcji</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .filter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .filter-group {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .filter-group:hover {
+            transform: translateY(-2px);
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .show-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .show-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .show-button:active {
+            transform: translateY(0);
+        }
+
+        .show-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results {
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .school-container {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .school-header {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .class-schedule {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .class-header {
+            background: #FF9800;
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .schedule-table th {
+            background: #f1f1f1;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        .schedule-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85em;
+            vertical-align: top;
+        }
+
+        .schedule-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .teacher {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        .room {
+            color: #888;
+            font-size: 0.8em;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin: 50px 0;
+        }
+
+        .loading {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 1.1em;
+            margin: 30px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c62828;
+        }
+
+        .mode-selector {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .mode-button {
+            background: white;
+            border: 2px solid #2196F3;
+            color: #2196F3;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-button.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .mode-button:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        .school-schedule {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .time-slot {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            min-height: 80px;
+        }
+
+        .time-slot:last-child {
+            border-bottom: none;
+        }
+
+        .time-column {
+            background: #f8f9fa;
+            padding: 20px;
+            font-weight: 600;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px solid #ddd;
+            font-size: 1.1em;
+        }
+
+        .lessons-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .lesson-card {
+            background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .lesson-subject {
+            font-weight: 600;
+            color: #1976D2;
+            margin-bottom: 5px;
+        }
+
+        .lesson-class {
+            background: #FF9800;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .filter-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-table {
+                font-size: 0.8em;
+            }
+
+            .mode-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .time-slot {
+                flex-direction: column;
+            }
+
+            .time-column {
+                min-width: auto;
+                border-right: none;
+                border-bottom: 2px solid #ddd;
+            }
+
+            .lessons-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏫 System Planów Lekcji</h1>
+            <p>Wybierz kryteria filtrowania i wyświetl plan zajęć</p>
+        </div>
+
+        <div class="controls">
+            <div class="mode-selector">
+                <h3>Tryb działania:</h3>
+                <div class="mode-buttons">
+                    <button class="mode-button active" onclick="switchMode('demo')">
+                        📊 Tryb Demo (przykładowe dane)
+                    </button>
+                    <button class="mode-button" onclick="switchMode('database')">
+                        🗄️ Połączenie z bazą danych
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="school-select">🏢 Szkoła:</label>
+                    <select id="school-select" onchange="onSchoolChange()">
+                        <option value="">-- Wszystkie szkoły --</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="class-select">🎓 Klasa:</label>
+                    <select id="class-select">
+                        <option value="">-- Wszystkie klasy --</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="teacher-select">👨‍🏫 Nauczyciel:</label>
+                    <select id="teacher-select">
+                        <option value="">-- Wszyscy nauczyciele --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button class="show-button" id="show-button" onclick="showSchedule()">
+                    📅 Pokaż Plan
+                </button>
+            </div>
+        </div>
+
+        <div class="results" id="results" style="display: none;">
+            <!-- Wyniki będą się pokazywać po kliknięciu "Pokaż Plan" -->
+        </div>
+    </div>
+
+    <script>
+        // Konfiguracja
+        const API_BASE_URL = 'api.php';
+        let currentMode = 'demo';
+
+        // Przykładowe dane dla trybu demo
+        const demoData = {
+            schools: [
+                { id: 'szkola1', nazwa: 'Szkoła Podstawowa nr 1' },
+                { id: 'szkola2', nazwa: 'Szkoła Podstawowa nr 2' }
+            ],
+            classes: [
+                { id: '1a', nazwa: '1A', szkola_id: 'szkola1' },
+                { id: '1b', nazwa: '1B', szkola_id: 'szkola1' },
+                { id: '1c', nazwa: '1C', szkola_id: 'szkola1' },
+                { id: '2a', nazwa: '2A', szkola_id: 'szkola2' },
+                { id: '2b', nazwa: '2B', szkola_id: 'szkola2' },
+                { id: '2c', nazwa: '2C', szkola_id: 'szkola2' }
+            ],
+            teachers: [
+                { id: 'kowalski', imie: 'Jan', nazwisko: 'Kowalski' },
+                { id: 'nowak', imie: 'Anna', nazwisko: 'Nowak' },
+                { id: 'wisniewska', imie: 'Maria', nazwisko: 'Wiśniewska' },
+                { id: 'kaminski', imie: 'Piotr', nazwisko: 'Kamiński' },
+                { id: 'zielinska', imie: 'Katarzyna', nazwisko: 'Zielińska' }
+            ]
+        };
+
+        // Demo schedule data
+        const demoScheduleData = {
+            szkola1: {
+                name: "Szkoła Podstawowa nr 1",
+                classes: {
+                    "1a": {
+                        name: "Klasa 1A",
+                        schedule: [
+                            { time: "8:00-8:45", monday: "Matematyka<br><span class='teacher'>J. Kowalski</span><br><span class='room'>Sala 101</span>", tuesday: "Polski<br><span class='teacher'>A. Nowak</span><br><span class='room'>Sala 102</span>", wednesday: "Przyroda<br><span class='teacher'>M. Wiśniewska</span><br><span class='room'>Sala 103</span>", thursday: "Matematyka<br><span class='teacher'>J. Kowalski</span><br><span class='room'>Sala 101</span>", friday: "WF<br><span class='teacher'>P. Kamiński</span><br><span class='room'>Sala gym</span>" },
+                            { time: "8:55-9:40", monday: "Polski<br><span class='teacher'>A. Nowak</span><br><span class='room'>Sala 102</span>", tuesday: "Matematyka<br><span class='teacher'>J. Kowalski</span><br><span class='room'>Sala 101</span>", wednesday: "Angielski<br><span class='teacher'>K. Zielińska</span><br><span class='room'>Sala 104</span>", thursday: "Przyroda<br><span class='teacher'>M. Wiśniewska</span><br><span class='room'>Sala 103</span>", friday: "Polski<br><span class='teacher'>A. Nowak</span><br><span class='room'>Sala 102</span>" },
+                            { time: "9:50-10:35", monday: "Przyroda<br><span class='teacher'>M. Wiśniewska</span><br><span class='room'>Sala 103</span>", tuesday: "WF<br><span class='teacher'>P. Kamiński</span><br><span class='room'>Sala gym</span>", wednesday: "Matematyka<br><span class='teacher'>J. Kowalski</span><br><span class='room'>Sala 101</span>", thursday: "Angielski<br><span class='teacher'>K. Zielińska</span><br><span class='room'>Sala 104</span>", friday: "Plastyka<br><span class='teacher'>M. Wiśniewska</span><br><span class='room'>Sala 105</span>" }
+                        ]
+                    },
+                    "1b": {
+                        name: "Klasa 1B",
+                        schedule: [
+                            { time: "8:00-8:45", monday: "Polski<br><span class='teacher'>A. Nowak</span><br><span class='room'>Sala 106</span>", tuesday: "Matematyka<br><span class='teacher'>J. Kowalski</span><br><span class='room'>Sala 101</span>", wednesday: "WF<br><span class='teacher'>P. Kamiński</span><br><span class='room'>Sala gym</span>", thursday: "Przyroda<br><span class='teacher'>M. Wiśniewska</span><br><span class='room'>Sala 103</span>", friday: "Angielski<br><span class='teacher'>K. Zielińska</span><br><span class='room'>Sala 104</span>" },
+                            { time: "8:55-9:40", monday: "Matematyka<br><span class='teacher'>J. Kowalski</span><br><span class='room'>Sala 101</span>", tuesday: "Angielski<br><span class='teacher'>K. Zielińska</span><br><span class='room'>Sala 104</span>", wednesday: "Polski<br><span class='teacher'>A. Nowak</span><br><span class='room'>Sala 106</span>", thursday: "WF<br><span class='teacher'>P. Kamiński</span><br><span class='room'>Sala gym</span>", friday: "Przyroda<br><span class='teacher'>M. Wiśniewska</span><br><span class='room'>Sala 103</span>" }
+                        ]
+                    }
+                }
+            },
+            szkola2: {
+                name: "Szkoła Podstawowa nr 2",
+                classes: {
+                    "2a": {
+                        name: "Klasa 2A",
+                        schedule: [
+                            { time: "8:00-8:45", monday: "Historia<br><span class='teacher'>A. Nowak</span><br><span class='room'>Sala 201</span>", tuesday: "Matematyka<br><span class='teacher'>J. Kowalski</span><br><span class='room'>Sala 202</span>", wednesday: "Polski<br><span class='teacher'>K. Zielińska</span><br><span class='room'>Sala 203</span>", thursday: "WF<br><span class='teacher'>P. Kamiński</span><br><span class='room'>Sala gym</span>", friday: "Przyroda<br><span class='teacher'>M. Wiśniewska</span><br><span class='room'>Sala 204</span>" }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Funkcje trybu
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Aktualizuj przyciski
+            document.querySelectorAll('.mode-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Załaduj dane
+            loadInitialData();
+        }
+
+        // Ładowanie danych
+        async function loadInitialData() {
+            try {
+                await loadSchools();
+                await loadTeachers();
+                // Nie pokazuj planu automatycznie - czekaj na kliknięcie
+            } catch (error) {
+                showError('Błąd ładowania danych: ' + error.message);
+            }
+        }
+
+        async function loadSchools() {
+            if (currentMode === 'demo') {
+                populateSelect('school-select', demoData.schools, 'id', 'nazwa');
+            } else {
+                const schools = await fetchFromAPI('schools');
+                populateSelect('school-select', schools, 'id', 'nazwa');
+            }
+        }
+
+        async function loadTeachers() {
+            if (currentMode === 'demo') {
+                const teachers = demoData.teachers.map(t => ({
+                    id: t.id,
+                    display: `${t.imie} ${t.nazwisko}`
+                }));
+                populateSelect('teacher-select', teachers, 'id', 'display');
+            } else {
+                const teachers = await fetchFromAPI('teachers');
+                const formatted = teachers.map(t => ({
+                    id: t.id,
+                    display: `${t.imie} ${t.nazwisko}`
+                }));
+                populateSelect('teacher-select', formatted, 'id', 'display');
+            }
+        }
+
+        async function onSchoolChange() {
+            const schoolId = document.getElementById('school-select').value;
+            
+            if (currentMode === 'demo') {
+                const classes = demoData.classes.filter(c => 
+                    !schoolId || c.szkola_id === schoolId
+                );
+                populateSelect('class-select', classes, 'id', 'nazwa');
+            } else {
+                const classes = await fetchFromAPI('groups', { szkola: schoolId });
+                populateSelect('class-select', classes, 'id', 'nazwa');
+            }
+        }
+
+        // Funkcje API
+        async function fetchFromAPI(action, params = {}) {
+            if (currentMode === 'demo') {
+                return [];
+            }
+
+            const url = new URL(API_BASE_URL, window.location.origin);
+            url.searchParams.append('action', action);
+            
+            Object.keys(params).forEach(key => {
+                if (params[key]) {
+                    url.searchParams.append(key, params[key]);
+                }
+            });
+
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            return data;
+        }
+
+        // Funkcje pomocnicze
+        function populateSelect(selectId, items, valueField, textField) {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+            
+            const firstOption = select.options[0];
+            select.innerHTML = '';
+            select.appendChild(firstOption);
+            
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[valueField];
+                option.textContent = item[textField];
+                select.appendChild(option);
+            });
+            
+            if (currentValue) {
+                select.value = currentValue;
+            }
+        }
+
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = `<div class="error">⚠️ ${message}</div>`;
+        }
+
+        function setLoading(isLoading) {
+            const button = document.getElementById('show-button');
+            button.disabled = isLoading;
+            button.textContent = isLoading ? '⏳ Ładowanie...' : '📅 Pokaż Plan';
+        }
+
+        // Główna funkcja wyświetlania planu
+        async function showSchedule() {
+            const school = document.getElementById('school-select').value;
+            const classValue = document.getElementById('class-select').value;
+            const teacher = document.getElementById('teacher-select').value;
+            const resultsDiv = document.getElementById('results');
+
+            // Pokaż sekcję wyników
+            resultsDiv.style.display = 'block';
+
+            setLoading(true);
+
+            try {
+                if (currentMode === 'demo') {
+                    showDemoSchedule(school, classValue, teacher);
+                } else {
+                    const scheduleData = await fetchFromAPI('schedule', {
+                        szkola: school,
+                        grupa: classValue,
+                        nauczyciel: teacher
+                    });
+                    
+                    displayScheduleData(scheduleData);
+                }
+            } catch (error) {
+                showError('Błąd pobierania planu: ' + error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function showDemoSchedule(school, classValue, teacher) {
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            let hasResults = false;
+
+            if (school && demoScheduleData[school]) {
+                if (classValue) {
+                    // Wyświetl plan konkretnej klasy
+                    html += generateSchoolSchedule(demoScheduleData[school], classValue, teacher);
+                } else {
+                    // Wyświetl plan całej szkoły
+                    html += generateWholeSchoolSchedule(demoScheduleData[school], teacher);
+                }
+                hasResults = true;
+            } else if (!school) {
+                // Wszystkie szkoły
+                for (const schoolKey in demoScheduleData) {
+                    const schoolData = demoScheduleData[schoolKey];
+                    if (classValue) {
+                        const schoolHtml = generateSchoolSchedule(schoolData, classValue, teacher);
+                        if (schoolHtml) {
+                            html += schoolHtml;
+                            hasResults = true;
+                        }
+                    } else {
+                        html += generateWholeSchoolSchedule(schoolData, teacher);
+                        hasResults = true;
+                    }
+                }
+            }
+
+            if (!hasResults) {
+                html = '<div class="no-results">❌ Nie znaleziono planów spełniających wybrane kryteria.</div>';
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function displayScheduleData(scheduleData) {
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+
+            if (Object.keys(scheduleData).length === 0) {
+                html = '<div class="no-results">❌ Nie znaleziono planów spełniających wybrane kryteria.</div>';
+            } else {
+                for (const schoolName in scheduleData) {
+                    html += generateSchoolSchedule(scheduleData[schoolName]);
+                }
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function generateWholeSchoolSchedule(schoolData, selectedTeacher = '') {
+            // Zbierz wszystkie lekcje z wszystkich klas
+            const allLessons = [];
+            
+            for (const classKey in schoolData.classes) {
+                const classData = schoolData.classes[classKey];
+                
+                classData.schedule.forEach(timeSlot => {
+                    const time = timeSlot.time;
+                    
+                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(day => {
+                        if (timeSlot[day] && timeSlot[day] !== '-') {
+                            const lessonHtml = timeSlot[day];
+                            
+                            // Filtruj po nauczycielu jeśli wybrano
+                            if (selectedTeacher && !lessonHtml.toLowerCase().includes(getTeacherName(selectedTeacher).toLowerCase())) {
+                                return;
+                            }
+                            
+                            allLessons.push({
+                                time: time,
+                                day: day,
+                                className: classData.name,
+                                content: lessonHtml
+                            });
+                        }
+                    });
+                });
+            }
+            
+            // Grupuj lekcje po czasie
+            const lessonsByTime = {};
+            allLessons.forEach(lesson => {
+                if (!lessonsByTime[lesson.time]) {
+                    lessonsByTime[lesson.time] = [];
+                }
+                lessonsByTime[lesson.time].push(lesson);
+            });
+            
+            // Sortuj czasy
+            const sortedTimes = Object.keys(lessonsByTime).sort();
+            
+            let scheduleHtml = '';
+            sortedTimes.forEach(time => {
+                const lessons = lessonsByTime[time];
+                
+                scheduleHtml += `
+                    <div class="time-slot">
+                        <div class="time-column">
+                            <strong>${time}</strong>
+                        </div>
+                        <div class="lessons-grid">
+                `;
+                
+                lessons.forEach(lesson => {
+                    // Parsuj zawartość lekcji
+                    const parts = lesson.content.split('<br>');
+                    const subject = parts[0];
+                    const teacher = parts[1]?.replace(/<span class='teacher'>|<\/span>/g, '') || '';
+                    const room = parts[2]?.replace(/<span class='room'>|<\/span>/g, '') || '';
+                    
+                    scheduleHtml += `
+                        <div class="lesson-card">
+                            <div class="lesson-class">${lesson.className}</div>
+                            <div class="lesson-subject">${subject}</div>
+                            <div class="teacher">${teacher}</div>
+                            <div class="room">${room}</div>
+                        </div>
+                    `;
+                });
+                
+                scheduleHtml += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return `
+                <div class="school-container">
+                    <div class="school-header">
+                        🏫 ${schoolData.name} - Plan całej szkoły
+                    </div>
+                    <div class="school-schedule">
+                        ${scheduleHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateSchoolSchedule(schoolData, selectedClass = '', selectedTeacher = '') {
+            if (selectedClass) {
+                // Wyświetl plan konkretnej klasy (stary sposób)
+                let html = '';
+                let schoolHasResults = false;
+                let classesHtml = '';
+
+                for (const classKey in schoolData.classes) {
+                    if (classKey !== selectedClass) continue;
+
+                    const classData = schoolData.classes[classKey];
+                    
+                    if (selectedTeacher && currentMode === 'demo') {
+                        let hasTeacher = false;
+                        for (const lesson of classData.schedule) {
+                            for (const day in lesson) {
+                                if (day !== 'time' && lesson[day] && lesson[day].toLowerCase().includes(getTeacherName(selectedTeacher).toLowerCase())) {
+                                    hasTeacher = true;
+                                    break;
+                                }
+                            }
+                            if (hasTeacher) break;
+                        }
+                        if (!hasTeacher) continue;
+                    }
+
+                    classesHtml += generateClassSchedule(classData);
+                    schoolHasResults = true;
+                }
+
+                if (schoolHasResults) {
+                    html += `
+                        <div class="school-container">
+                            <div class="school-header">
+                                🏫 ${schoolData.name}
+                            </div>
+                            <div class="schedule-grid">
+                                ${classesHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return html;
+            } else {
+                // Wyświetl plan całej szkoły
+                return generateWholeSchoolSchedule(schoolData, selectedTeacher);
+            }
+        }
+
+        function generateClassSchedule(classData) {
+            let tableRows = '';
+            
+            for (const lesson of classData.schedule) {
+                tableRows += `
+                    <tr>
+                        <td><strong>${lesson.time}</strong></td>
+                        <td>${lesson.monday || '-'}</td>
+                        <td>${lesson.tuesday || '-'}</td>
+                        <td>${lesson.wednesday || '-'}</td>
+                        <td>${lesson.thursday || '-'}</td>
+                        <td>${lesson.friday || '-'}</td>
+                    </tr>
+                `;
+            }
+
+            return `
+                <div class="class-schedule">
+                    <div class="class-header">
+                        🎓 ${classData.name}
+                    </div>
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Godz.</th>
+                                <th>Pon.</th>
+                                <th>Wt.</th>
+                                <th>Śr.</th>
+                                <th>Czw.</th>
+                                <th>Pt.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function getTeacherName(teacherKey) {
+            if (currentMode === 'demo') {
+                const teachers = {
+                    'kowalski': 'J. Kowalski',
+                    'nowak': 'A. Nowak',
+                    'wisniewska': 'M. Wiśniewska',
+                    'kaminski': 'P. Kamiński',
+                    'zielinska': 'K. Zielińska'
+                };
+                return teachers[teacherKey] || '';
+            }
+            return teacherKey;
+        }
+
+        // Inicjalizacja przy ładowaniu strony
+        window.addEventListener('DOMContentLoaded', function() {
+            loadInitialData();
+            
+            // Ukryj wyniki na start
+            document.getElementById('results').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
