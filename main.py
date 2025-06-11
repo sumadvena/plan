@@ -1,7 +1,7 @@
 import mysql.connector
 from db_config import config
 from db_operations import inserts, utils
-from schedule import populate, schedule
+from schedule import populate, schedule, cost_functions
 
 
 # TODO: data creation
@@ -10,17 +10,15 @@ from schedule import populate, schedule
 
 
 def main():
-    cnx = mysql.connector.connect(**config)
-    cursor = cnx.cursor()
-    query = "show columns from privileges_classrooms"
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    print(rows)
-    schedule.simple_reasoning(2002, 1, 1)
+    cost_functions.worst_day(year=2002, version=1, id_school=1, id_teacher=66)
+    cost_functions.mean_week(year=2002, version=1, id_school=1, id_teacher=66)
 
-    cursor.close()
-    cnx.close()
-    populate.populate()
+    # schedule.simple_reasoning(year=2002, school_id=1)
+    # schedule.simple_reasoning(year=2002, school_id=2)
+    # schedule.random_sets(year=2004, school_id=1)
+    # schedule.random_sets(year=2004, school_id=2)
+
+    # populate.populate()
 
 
 if __name__ == "__main__":
