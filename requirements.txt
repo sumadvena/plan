@@ -2,3 +2,7 @@
 #    uv export --no-hashes --format requirements-txt
 mysql-connector-python==9.3.0
     # via plan
+Flask==3.0.0
+    # via plan
+Flask-CORS==4.0.0
+    # via plan

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Strona nie znaleziona - Plan Lekcji{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-content">
+        <h1>404</h1>
+        <h2>Strona nie znaleziona</h2>
+        <p>Przepraszamy, ale strona której szukasz nie istnieje.</p>
+        <a href="{{ url_for('index') }}" class="primary-btn">Powrót do strony głównej</a>
+    </div>
+</div>
+
+<style>
+.error-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    text-align: center;
+}
+
+.error-content h1 {
+    font-size: 6rem;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin-bottom: 0;
+    line-height: 1;
+}
+
+.error-content h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.error-content p {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1.125rem;
+}
+</style>
+{% endblock %}
