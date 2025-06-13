@@ -36,8 +36,8 @@ def simple_reasoning(year, school_id):
     # 10 per each day
     # ex. Monday has 1st, 6th, 11th, 16th, 21st, ... 46th timeframes
     # timeframe % 5 = day of the week. Friday is 0th day
-    for timeframe in range(1, 51):
-        for classroom in classrooms:
+    for classroom in classrooms:
+        for timeframe in range(1, 51):
             for assigned_set in sets:
                 # ignore error, if all of the weekly hours are disposed, proceed
                 if assigned_set[4] <= 0:
@@ -122,10 +122,10 @@ def random_sets(year, school_id):
     classrooms = classroom_cursor.fetchall()
     classroom_cursor.close()
 
-    for timeframe in range(1, 51):
-        for classroom in classrooms:
+    for classroom in classrooms:
+        for timeframe in range(1, 51):
             while sets:
-                assigned_set = sets[random.randint(0, len(sets))]
+                assigned_set = sets[random.randint(0, len(sets) - 1)]
                 # ignore error, if all of the weekly hours are disposed, proceed
                 if assigned_set[4] <= 0:
                     print("course's weekly requirements are filled", assigned_set)
