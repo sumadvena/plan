@@ -72,6 +72,24 @@ def simple_reasoning(year, school_id):
                     )
                     continue
 
+                if utils.check_group(
+                    (year, school_id, version, timeframe, assigned_set[3])
+                ):
+                    print(
+                        "Group already booked in this timeframe",
+                        assigned_set,
+                        timeframe,
+                    )
+
+                if utils.check_teacher(
+                    (year, school_id, version, timeframe, assigned_set[1])
+                ):
+                    print(
+                        "Teacher already booked in this timeframe",
+                        assigned_set,
+                        timeframe,
+                    )
+
                 if inserts.create_timeframe(
                     year=year,
                     school_id=school_id,
@@ -159,6 +177,24 @@ def random_sets(year, school_id):
                         timeframe,
                     )
                     continue
+
+                if utils.check_group(
+                    (year, school_id, version, timeframe, assigned_set[3])
+                ):
+                    print(
+                        "Group already booked in this timeframe",
+                        assigned_set,
+                        timeframe,
+                    )
+
+                if utils.check_teacher(
+                    (year, school_id, version, timeframe, assigned_set[1])
+                ):
+                    print(
+                        "Teacher already booked in this timeframe",
+                        assigned_set,
+                        timeframe,
+                    )
 
                 if inserts.create_timeframe(
                     year=year,

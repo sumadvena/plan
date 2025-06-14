@@ -385,8 +385,8 @@ def create_unified_schedule(items, group_name, school_name, times, days):
         timeframe = item["timeframe"]
 
         # Oblicz dzień i godzinę z timeframe
-        day_index = ((timeframe - 1) % 50) // 10
-        hour_index = (timeframe - 1) % 10
+        day_index = (timeframe - 1) % 5
+        hour_index = (timeframe - 1) // 5
 
         if day_index >= len(days) or hour_index >= len(times):
             continue
