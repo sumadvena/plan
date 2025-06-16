@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-container">
+    <!-- Filters Section -->
+    <div class="filters-section" id="filters-section">
+        <div class="filters-header">
+            <h1>Plan Lekcji</h1>
+            <p>Wybierz kryteria filtrowania</p>
+        </div>
+        
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label for="school-select">Szkoła</label>
+                <select id="school-select" class="filter-select">
+                    <option value="">Wszystkie szkoły</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="group-select">Klasa</label>
+                <select id="group-select" class="filter-select" disabled>
+                    <option value="">Wszystkie klasy</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="teacher-select">Nauczyciel</label>
+                <select id="teacher-select" class="filter-select" disabled>
+                    <option value="">Wszyscy nauczyciele</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="year-select">Rok szkolny</label>
+                <select id="year-select" class="filter-select">
+                    <option value="">Wszystkie lata</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="filters-actions">
+            <button id="show-schedule-btn" class="primary-btn">Pokaż Plan</button>
+        </div>
+    </div>
+    
+    <!-- Schedule Section -->
+    <div class="schedule-section" id="schedule-section" style="display: none;">
+        <div class="schedule-header">
+            <div class="schedule-header-left">
+                <button id="back-btn" class="back-btn" title="Powrót do filtrów">
+                    ← Strona główna
+                </button>
+                <h1 class="schedule-title" id="schedule-title">Plan zajęć</h1>
+            </div>
+            <button class="options-btn" id="options-btn" title="Opcje filtrowania">
+                <span class="options-dots">⋯</span>
+            </button>
+        </div>
+        
+        <!-- Options Panel (hidden by default) -->
+        <div class="options-panel" id="options-panel" style="display: none;">
+            <div class="options-content">
+                <h3>Filtry</h3>
+                
+                <div class="options-grid">
+                    <div class="option-group">
+                        <h4>Szkoły</h4>
+                        <div class="option-list" id="schools-options"></div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <h4>Klasy</h4>
+                        <div class="option-list" id="groups-options"></div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <h4>Nauczyciele</h4>
+                        <div class="option-list" id="teachers-options"></div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <h4>Lata</h4>
+                        <div class="option-list" id="years-options"></div>
+                    </div>
+                </div>
+                
+                <div class="options-actions">
+                    <button id="apply-filters-btn" class="primary-btn">Zastosuj</button>
+                    <button id="clear-filters-btn" class="secondary-btn">Wyczyść wszystko</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Schedule Content -->
+        <div class="schedule-content" id="schedule-content">
+            <!-- Schedule will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}

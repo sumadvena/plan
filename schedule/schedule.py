@@ -36,9 +36,9 @@ def simple_reasoning(year, school_id):
     # 10 per each day
     # ex. Monday has 1st, 6th, 11th, 16th, 21st, ... 46th timeframes
     # timeframe % 5 = day of the week. Friday is 0th day
-    for timeframe in range(1, 51):
-        for classroom in classrooms:
-            for assigned_set in sets:
+    for assigned_set in sets:
+        for timeframe in range(1, 51):
+            for classroom in classrooms:
                 # ignore error, if all of the weekly hours are disposed, proceed
                 if assigned_set[4] <= 0:
                     print("course's weekly requirements are filled", assigned_set)
@@ -67,6 +67,26 @@ def simple_reasoning(year, school_id):
                 ):
                     print(
                         "Classroom already booked in this set",
+                        assigned_set,
+                        timeframe,
+                    )
+                    continue
+
+                if utils.check_group(
+                    (year, school_id, version, timeframe, assigned_set[3])
+                ):
+                    print(
+                        "Group already booked in this timeframe",
+                        assigned_set,
+                        timeframe,
+                    )
+                    continue
+
+                if utils.check_teacher(
+                    (year, school_id, version, timeframe, assigned_set[1])
+                ):
+                    print(
+                        "Teacher already booked in this timeframe",
                         assigned_set,
                         timeframe,
                     )
@@ -122,10 +142,10 @@ def random_sets(year, school_id):
     classrooms = classroom_cursor.fetchall()
     classroom_cursor.close()
 
-    for timeframe in range(1, 51):
-        for classroom in classrooms:
-            while sets:
-                assigned_set = sets[random.randint(0, len(sets))]
+    while sets:
+        for timeframe in range(1, 51):
+            for classroom in classrooms:
+                assigned_set = sets[random.randint(0, len(sets) - 1)]
                 # ignore error, if all of the weekly hours are disposed, proceed
                 if assigned_set[4] <= 0:
                     print("course's weekly requirements are filled", assigned_set)
@@ -155,6 +175,26 @@ def random_sets(year, school_id):
                 ):
                     print(
                         "Classroom already booked in this set",
+                        assigned_set,
+                        timeframe,
+                    )
+                    continue
+
+                if utils.check_group(
+                    (year, school_id, version, timeframe, assigned_set[3])
+                ):
+                    print(
+                        "Group already booked in this timeframe",
+                        assigned_set,
+                        timeframe,
+                    )
+                    continue
+
+                if utils.check_teacher(
+                    (year, school_id, version, timeframe, assigned_set[1])
+                ):
+                    print(
+                        "Teacher already booked in this timeframe",
                         assigned_set,
                         timeframe,
                     )

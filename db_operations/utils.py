@@ -109,3 +109,25 @@ def check_booked_set(fields: tuple):
     cursor.close()
     cnx.close()
     return True if booked else False
+
+
+def check_teacher(fields: tuple):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+    query = "SELECT sch.id FROM schedule sch INNER JOIN assigned_sets s ON sch.id_assigned_set = s.id AND sch.year = %s AND sch.id_school = %s AND sch.schedule_version = %s AND sch.timeframe = %s AND s.id_teacher = %s"
+    cursor.execute(query, fields)
+    booked = cursor.fetchone()
+    cursor.close()
+    cnx.close()
+    return True if booked else False
+
+
+def check_group(fields: tuple):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+    query = "SELECT sch.id FROM schedule sch INNER JOIN assigned_sets s ON sch.id_assigned_set = s.id AND sch.year = %s AND sch.id_school = %s AND sch.schedule_version = %s AND sch.timeframe = %s AND s.id_group = %s"
+    cursor.execute(query, fields)
+    booked = cursor.fetchone()
+    cursor.close()
+    cnx.close()
+    return True if booked else False
